@@ -1,0 +1,5 @@
+date,workspace,model,usage_type,service_tier,input_tokens,cache_read_tokens,cache_creation_tokens,output_tokens,quantity_hours,amount_usd
+2026-06-12,support-ws,claude-opus-4-8,tokens,standard,2100000,0,0,640000,,26.50
+2026-06-12,analytics-ws,claude-sonnet-4-6,tokens,batch,9000000,0,0,1800000,,20.25
+2026-06-12,support-ws,claude-haiku-4-5,tokens,standard,800000,11500000,900000,420000,,4.78
+2026-06-12,support-ws,,agent_runtime,standard,,,,,310,24.80

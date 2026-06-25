@@ -1,0 +1,6 @@
+invoice_date,project,line_item,quantity,unit,unit_price,amount_usd
+2026-06-30,rag-prod,Read Units,920000000,RU,0.00000025,230.00
+2026-06-30,rag-prod,Write Units,140000000,WU,0.0000004,56.00
+2026-06-30,rag-prod,Storage,165,GB-month,0.33,54.45
+2026-06-30,rag-prod,Capacity Fee,1,reservation,88.00,88.00
+2026-06-30,rag-dev,Monthly Minimum True-up,1,plan-minimum,50.00,31.00

@@ -1,0 +1,6 @@
+date,project,model,operation,service_tier,input_tokens,cached_input_tokens,output_tokens,num_requests,amount_usd
+2026-06-12,prod-assistant,gpt-5.4,chat.completions,standard,12500000,4200000,3100000,41000,78.40
+2026-06-12,data-enrichment,gpt-5.4-mini,chat.completions,batch,30000000,0,6000000,2000,26.25
+2026-06-12,prod-assistant,text-embedding-3-large,embeddings,standard,88000000,0,0,120000,11.44
+2026-06-12,prod-assistant,gpt-5.4,web_search,standard,640000,0,0,3200,32.00
+2026-06-12,legacy-classifier,ft:gpt-4.1:acme::r7,chat.completions,standard,5200000,0,900000,8800,26.40
