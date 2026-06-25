@@ -1,0 +1,3 @@
+invoice_date,vendor,product,seats,unit_price,amount_usd,expense_channel
+2026-06-05,GitHub,Copilot Business,60,19.00,1140.00,corporate-procurement
+2026-06-05,Acme AI,Acme Agent Pro,4,40.00,160.00,personal-card-reimbursement
