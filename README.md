@@ -1,71 +1,62 @@
-# Synthetic Billing Fixtures — Normalization Test Harness
+# Example: AWS + Frontier APIs + Colocation
 
-A runnable test fixture that proves the canonical schema (from
-`ai-cost-allocation-workbook.xlsx`) is complete against **real billing export
-shapes** before you point your ingestion layer at live data.
+A worked normalization example for a customer whose AI stack spans three worlds at
+once. It proves the canonical schema absorbs not just cloud and managed APIs, but
+**owned colocation infrastructure** — the case that breaks most cloud-only cost tools.
 
-All data is fabricated. Dollar figures are directional (mid-2026) and exist only
-to exercise the mapping — treat the *structure* as the durable part.
+## The customer's stack
 
-## What's here
-
-```
-raw/
-  focus_aws_export.csv       FOCUS-conformant cloud export (real FOCUS columns)
-  openai_usage_export.csv    OpenAI usage dump (per-operation token rows)
-  anthropic_usage_export.csv Anthropic usage dump (token + agent-runtime rows)
-  coreweave_invoice.csv      Neocloud invoice (per-GPU-hour, $0 egress)
-  pinecone_invoice.csv       Vector-DB invoice (RU/WU/storage/capacity)
-  saas_seats_invoice.csv     Per-seat SaaS (one governed, one shadow-AI)
-normalize.py                 Reference normalizer + coverage assertion
-normalized_output.csv        Golden output (29 lines on the canonical schema)
-```
-
-Six **different native schemas** — different column names for the same concepts —
-so the normalizer has to do real work, not a trivial rename.
+| Layer | Sources here | What it exercises |
+|---|---|---|
+| **AWS (cloud)** | `aws_focus.csv` | Bedrock, SageMaker endpoint, EC2 reserved GPU, S3, egress |
+| **Frontier direct APIs** | `frontier_openai.csv`, `frontier_anthropic.csv` | per-token inference, batch tier, cache reads, agent runtime |
+| **Colocation** | `colo_invoice.csv`, `colo_depreciation.csv` | rack/power/cross-connect/transit/remote-hands + owned-hardware depreciation |
 
 ## Run it
 
 ```bash
-cd billing-fixtures
-python normalize.py            # writes normalized_output.csv + prints coverage
-python normalize.py --check    # same, but exits non-zero if anything is UNMAPPED
+cd example-aws-frontier-colo
+python normalize_example.py --check     # maps all 21 lines; exits non-zero on any UNMAPPED
+python report.py normalized_example_output.csv   # same reporting layer as the main fixture
 ```
 
-Expected: `PASS: full coverage` and exit 0.
+## Why the colo half matters
 
-## Why this is a test, not just sample data
+Cloud bills never carry capex or facilities lines, so a cloud-only schema silently
+drops a huge share of an owned-infrastructure customer's true AI cost. Here that gap
+is closed by two colo-specific adapters:
 
-`normalize.py` maps every raw line onto the canonical schema and marks any field
-it cannot resolve as `UNMAPPED`. The `--check` flag fails the run if a single
-`UNMAPPED` survives. So:
+- **`colo_invoice.csv`** → recurring opex: cabinet space and power map to
+  `facilities-hardware`; cross-connect and IP transit to `networking`; remote hands
+  to `professional-services`. Contract commitments set `FixedVsVariable=fixed` and a
+  `enterprise-agreement` commitment type; metered power overage stays `variable`.
+- **`colo_depreciation.csv`** → the owned-hardware depreciation schedule. Monthly
+  depreciation is the line item; GPU servers map to `compute-infra` (with
+  `ModelChannel=self-hosted-weights`), switches to `networking`, storage arrays to
+  `storage` — all tagged **`CapexVsOpex=capex`**. This is how owned silicon shows up
+  in a cost model that's otherwise all opex.
 
-- Add a new provider/service to the workbook's `Provider_Mapping` tab → add the
-  matching rule to the relevant adapter here → the fixture stays green.
-- A real export arrives with a line shape nobody mapped → the run goes **red**,
-  pointing at the exact source file, service, and field. That's your regression
-  signal that the schema (or an adapter) needs extending.
+The result: this customer's biggest cost domain is `compute-infra` (~57%), driven
+almost entirely by GPU-server depreciation in the colo — a number that would be
+**completely invisible** on the AWS + API bills alone.
 
-## What each fixture deliberately exercises
+## What the run produces
 
-| Fixture | Stresses |
-|---|---|
-| FOCUS AWS | direct FOCUS-column mapping; sub-classifying *within* one ServiceName (EC2 → compute vs networking); `CommitmentDiscountStatus=Unused` → `WasteFlag=unused-commitment`; Bedrock → `marketplace` channel + commitment-eligible |
-| OpenAI | per-operation → CostDomain (chat/embeddings/web_search); `service_tier` → PricingModel (batch); `ft:` prefix → `fine-tuned-hosted` channel; tool call as `per-request` not `per-token` |
-| Anthropic | token rows vs a non-token `agent_runtime` row → `orchestration-agents`; batch tier → `batch-inference` lifecycle |
-| CoreWeave | per-GPU-hour shape; reserved vs on-demand → commitment; the `$0.00` egress line (no-egress neocloud) |
-| Pinecone | retrieval billing units (RU/WU) + storage + the unpublished `Capacity Fee`; monthly-minimum true-up → `serving-idle` |
-| SaaS seats | per-seat licensing; `expense_channel=personal-card-reimbursement` → `GovernanceStatus=shadow-AI` |
+- 21 normalized lines, full coverage (no UNMAPPED)
+- CostDomains populated: inference, compute-infra, storage, networking,
+  orchestration-agents, **facilities-hardware**, professional-services
+- DeploymentModels: hyperscaler-platform, self-hosted-cloud-GPU, managed-API,
+  **colocation**
+- CapexVsOpex split: opex + **capex** (the 4 depreciation lines)
+- Rough mix: total ~$51.3K — AWS ~$16.3K, frontier APIs ~$0.26K, **colo ~$34.6K**
 
-## Coverage produced (current fixtures)
+That last line is the whole point: for this customer the colo dwarfs the cloud and
+API spend, and only a schema that models facilities + depreciation will show it.
 
-- **CostDomain:** inference, training, compute-infra, retrieval-RAG, storage, networking, licensing-subscription, orchestration-agents
-- **DeploymentModel:** hyperscaler-platform, self-hosted-cloud-GPU, managed-API, neocloud, SaaS-embedded
-- **Flags fired:** 1 shadow-AI, 1 unused-commitment
+## Extending the schema
 
-## Adapting to your real data
-
-The adapters in `normalize.py` are intentionally thin and mirror the workbook's
-`Provider_Mapping`. To wire up live data: point `RAW_DIR` at your real exports,
-adjust column names per provider in the relevant `adapt_*` function, and keep the
-`--check` gate in CI so coverage never silently regresses.
+This example adds two fields the base fixture didn't use — `CapexVsOpex` and
+`FixedVsVariable` — both already defined in the workbook's `Schema_Fields` tab. The
+shared `report.py` is schema-tolerant: it runs against either output, treating
+absent optional columns gracefully. Add a provider, add its adapter, keep `--check`
+in CI, and coverage never silently regresses.

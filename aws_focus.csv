@@ -1,0 +1,6 @@
+BillingAccountId,ChargePeriodStart,ProviderName,PublisherName,ServiceName,ServiceCategory,ChargeCategory,ChargeDescription,RegionId,PricingUnit,PricingQuantity,BilledCost,CommitmentDiscountType,CommitmentDiscountStatus,Tags
+5510-2031,2026-06-01,AWS,Anthropic,Amazon Bedrock,AI and Machine Learning,Usage,Claude Sonnet 4.6 on-demand tokens,us-east-1,tokens,62000000,186.00,,,"{""env"":""prod"",""bu"":""product"",""app"":""in-app-assistant""}"
+5510-2031,2026-06-01,AWS,Amazon Web Services,Amazon SageMaker,AI and Machine Learning,Usage,ml.g5.12xlarge real-time endpoint,us-east-1,Hrs,720,4082.40,,,"{""env"":""prod"",""bu"":""product"",""app"":""ranking-svc""}"
+5510-2031,2026-06-01,AWS,Amazon Web Services,Amazon Elastic Compute Cloud,Compute,Usage,g5.48xlarge reserved instance,us-east-1,Hrs,720,11750.40,Reserved Instance,Used,"{""env"":""prod"",""bu"":""platform"",""app"":""embeddings-batch""}"
+5510-2031,2026-06-01,AWS,Amazon Web Services,Amazon Simple Storage Service,Storage,Usage,Standard storage - feature store & datasets,us-east-1,GB-Mo,8200,188.60,,,"{""env"":""prod"",""bu"":""platform""}"
+5510-2031,2026-06-01,AWS,Amazon Web Services,Amazon Elastic Compute Cloud,Networking,Usage,DataTransfer-Out - internet egress,us-east-1,GB,1500,135.00,,,"{""env"":""prod"",""bu"":""product""}"

@@ -1,0 +1,4 @@
+date,workspace,model,usage_type,service_tier,input_tokens,cache_read_tokens,cache_creation_tokens,output_tokens,quantity_hours,amount_usd
+2026-06-12,prod-agent,claude-opus-4-8,tokens,standard,3400000,9000000,1200000,980000,,52.30
+2026-06-12,prod-agent,claude-haiku-4-5,tokens,standard,6000000,22000000,0,1500000,,13.70
+2026-06-12,prod-agent,,agent_runtime,standard,,,,,420,33.60

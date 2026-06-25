@@ -1,0 +1,4 @@
+date,project,model,operation,service_tier,input_tokens,cached_input_tokens,output_tokens,num_requests,amount_usd
+2026-06-12,prod-copilot,gpt-5.4,chat.completions,standard,18000000,6000000,4500000,52000,112.50
+2026-06-12,batch-tagging,gpt-5.4-mini,chat.completions,batch,40000000,0,8000000,3000,35.00
+2026-06-12,prod-copilot,text-embedding-3-large,embeddings,standard,120000000,0,0,160000,15.60

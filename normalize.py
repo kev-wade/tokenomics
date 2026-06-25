@@ -89,9 +89,12 @@ def adapt_focus_aws(row):
     tags = json.loads(row.get("Tags") or "{}")
     status = row.get("CommitmentDiscountStatus","") or ""
     waste = "unused-commitment" if status == "Unused" else "none"
-    ch = "marketplace" if svc == "Amazon Bedrock" else "n/a"
+    ch = "hyperscaler-marketplace" if svc == "Amazon Bedrock" else "n/a"
     mp = "Anthropic" if row.get("PublisherName")=="Anthropic" else ""
-    commit = row.get("CommitmentDiscountType","") or "none"
+    COMMIT_MAP = {"Provisioned Throughput":"provisioned-throughput-unit","Savings Plan":"savings-plan",
+                  "Reserved Instance":"reserved-instance","":"none","none":"none"}
+    raw_commit = row.get("CommitmentDiscountType","") or "none"
+    commit = COMMIT_MAP.get(raw_commit, raw_commit)
     pmodel = "committed-savings-plan" if commit not in ("","none") else "on-demand"
     return rec(
         source_file="focus_aws_export.csv", ProviderName="AWS", ServiceName=svc,
@@ -189,8 +192,8 @@ def adapt_coreweave(row):
 def adapt_pinecone(row):
     li = row["line_item"]
     li_map = {
-        "Read Units": ("retrieval-RAG","per-query / per-RU / per-WU / per-AU","real-time-inference","on-demand"),
-        "Write Units": ("retrieval-RAG","per-query / per-RU / per-WU / per-AU","data-prep","on-demand"),
+        "Read Units": ("retrieval-RAG","per-RU","real-time-inference","on-demand"),
+        "Write Units": ("retrieval-RAG","per-WU","data-prep","on-demand"),
         "Storage": ("storage","per-GB-month","serving-idle","on-demand"),
         "Capacity Fee": ("retrieval-RAG","per-request","real-time-inference","on-demand"),
         "Monthly Minimum True-up": ("retrieval-RAG","flat","serving-idle","subscription"),

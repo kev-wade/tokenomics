@@ -1,0 +1,7 @@
+invoice_date,line_item,category,quantity,unit,unit_price,amount_usd,commitment
+2026-06-01,Cabinet space - full cabinet,space,4,cabinet-month,1450.00,5800.00,contract
+2026-06-01,Power - committed capacity,power,20,kW-month,225.00,4500.00,contract
+2026-06-01,Power - metered usage overage,power,3100,kWh,0.11,341.00,
+2026-06-01,Cross-connect - fiber,interconnect,6,xconn-month,300.00,1800.00,contract
+2026-06-01,Remote hands,services,8,hour,225.00,1800.00,
+2026-06-01,IP transit - 95th percentile,network,500,Mbps,0.55,275.00,contract
